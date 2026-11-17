@@ -1,0 +1,469 @@
+.profile {
+  display: flex;
+  background-color: #f0f2f5;
+  min-height: calc(100vh - 50px);
+}
+
+.profileRight {
+  flex: 9;
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+/* Cover Photo Section */
+.profileCoverSection {
+  position: relative;
+  margin-bottom: 80px;
+}
+
+.profileCoverContainer {
+  position: relative;
+  width: 100%;
+  height: 350px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.profileCoverImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.coverOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.profileCoverContainer:hover .coverOverlay {
+  opacity: 1;
+}
+
+.coverPicUploadBtn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #1877f2;
+  padding: 10px 20px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s;
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.profileCoverContainer:hover .coverPicUploadBtn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.coverPicUploadBtn:hover {
+  background-color: white;
+  transform: scale(1.05);
+}
+
+.uploadIcon {
+  font-size: 18px !important;
+}
+
+/* Profile Picture Section */
+.profilePictureSection {
+  position: absolute;
+  bottom: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+.profilePictureContainer {
+  position: relative;
+  width: 200px;
+  height: 200px;
+}
+
+.profileUserImg {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 5px solid white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background-color: #e4e6eb;
+}
+
+.profilePicUploadBtn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: #1877f2;
+  color: white;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 4px solid white;
+  transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.profilePicUploadBtn:hover {
+  background-color: #1565c0;
+  transform: scale(1.1);
+}
+
+/* Profile Info Section */
+.profileInfoSection {
+  background-color: white;
+  border-radius: 12px;
+  padding: 30px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.profileInfoContainer {
+  max-width: 100%;
+}
+
+.profileInfoTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.profileInfoLeft {
+  flex: 1;
+  min-width: 300px;
+}
+
+.profileInfoName {
+  font-size: 32px;
+  font-weight: 700;
+  color: #050505;
+  margin: 0 0 5px 0;
+}
+
+.profileInfoUsername {
+  font-size: 16px;
+  color: #65676b;
+  margin: 0 0 20px 0;
+}
+
+.profileInfoDetails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.infoItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #65676b;
+  font-size: 15px;
+}
+
+.infoIcon {
+  font-size: 20px !important;
+  color: #1877f2;
+}
+
+.profileInfoRight {
+  display: flex;
+  align-items: center;
+}
+
+.editProfileBtn {
+  background-color: #1877f2;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s;
+}
+
+.editProfileBtn:hover {
+  background-color: #1565c0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(24, 119, 242, 0.3);
+}
+
+.editIcon {
+  font-size: 18px !important;
+}
+
+/* Message Containers */
+.messageContainer {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.errorMessage {
+  background-color: #fee;
+  color: #c33;
+  border: 1px solid #fcc;
+}
+
+.successMessage {
+  background-color: #efe;
+  color: #3c3;
+  border: 1px solid #cfc;
+}
+
+.uploadingMessage {
+  background-color: #e3f2fd;
+  color: #1877f2;
+  border: 1px solid #90caf9;
+}
+
+/* Tabs */
+.profileTabs {
+  display: flex;
+  gap: 10px;
+  border-bottom: 2px solid #e4e6eb;
+  margin-top: 20px;
+}
+
+.tabButton {
+  background: none;
+  border: none;
+  padding: 15px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #65676b;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s;
+  position: relative;
+  top: 2px;
+}
+
+.tabButton:hover {
+  color: #1877f2;
+  background-color: #f0f2f5;
+  border-radius: 8px 8px 0 0;
+}
+
+.tabButton.active {
+  color: #1877f2;
+  border-bottom-color: #1877f2;
+}
+
+/* Content Section */
+.profileContentSection {
+  display: flex;
+  gap: 20px;
+}
+
+.profileContent {
+  flex: 2;
+  background-color: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-height: 400px;
+}
+
+.aboutContent {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.aboutCard {
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.aboutCard h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #050505;
+  margin: 0 0 15px 0;
+}
+
+.aboutText {
+  font-size: 15px;
+  color: #65676b;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.contactInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.contactItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #65676b;
+  font-size: 15px;
+}
+
+.contactIcon {
+  font-size: 22px !important;
+  color: #1877f2;
+}
+
+.photosContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  width: 100%;
+}
+
+.photoPlaceholder {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #65676b;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.photoIcon {
+  font-size: 64px !important;
+  color: #bcc0c4;
+  margin-bottom: 15px;
+}
+
+.photoPlaceholder p {
+  font-size: 16px;
+  margin: 0;
+}
+
+.profileRightSidebar {
+  flex: 1;
+  max-width: 300px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .profileContentSection {
+    flex-direction: column;
+  }
+
+  .profileRightSidebar {
+    max-width: 100%;
+  }
+
+  .profileInfoTop {
+    flex-direction: column;
+  }
+
+  .profileInfoRight {
+    width: 100%;
+  }
+
+  .editProfileBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .profileRight {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+
+  .profileCoverContainer {
+    height: 250px;
+  }
+
+  .profilePictureContainer {
+    width: 150px;
+    height: 150px;
+  }
+
+  .profileUserImg {
+    width: 150px;
+    height: 150px;
+  }
+
+  .profilePictureSection {
+    bottom: -75px;
+  }
+
+  .profileInfoSection {
+    padding: 20px;
+    margin-top: 80px;
+  }
+
+  .profileInfoName {
+    font-size: 24px;
+  }
+
+  .profileInfoDetails {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .profileTabs {
+    overflow-x: auto;
+  }
+
+  .tabButton {
+    padding: 12px 16px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .coverPicUploadBtn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .profileInfoName {
+    font-size: 20px;
+  }
+
+  .profileInfoUsername {
+    font-size: 14px;
+  }
+}

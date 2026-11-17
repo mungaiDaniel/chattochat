@@ -1,70 +1,117 @@
 import "./post.css";
-import { MoreVert , ThumbUpAlt, ThumbDownAlt } from "@material-ui/icons";
-import { Users } from "../../helperData";
-import axios from 'axios'
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { MoreVert, ThumbUpAlt } from "@mui/icons-material";
+import { api } from "../../api";
+import { useAuth } from "../../context/AuthContext";
+import { formatDate, imageSrc } from "../../utils/media";
 
-export default function Post({ post }) {
-  
-  const [like,setLike] = useState(post.likes)
-  const [isLiked,setIsLiked] = useState(false)
+export default function Post({ post, onChanged }) {
+  const { user } = useAuth();
+  const [likes, setLikes] = useState(post.likes);
+  const [liked, setLiked] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(post.body);
+  const [error, setError] = useState("");
 
-  const[users, setUser] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
+  const isOwner = user && user.id === post.user_id;
 
-  useEffect(() => {
-    axios.get("http://127.0.0.1:5000/api/v1/user")
-    .then((response) =>{
-      setUser(response.data.data)
-      setIsLoading(false)
-    })
-  }, [])
- 
+  const toggleLike = () => {
+    setLikes((n) => (liked ? n - 1 : n + 1));
+    setLiked(!liked);
+  };
 
-  if (isLoading){
-    return <h2>Loading....</h2>
-}
+  const saveEdit = async () => {
+    setError("");
+    try {
+      await api.updatePost(post.id, draft);
+      setEditing(false);
+      onChanged?.();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
-const handleItemClick = (e) => {
-  if (e.target.tagName === "H5") {
-    window.location.href = "/comments?id=" + post.id;
-  }
-};
-  const likeHandler =()=>{
-    setLike(isLiked ? like-1 : like+1)
-    setIsLiked(!isLiked)
-  }
+  const remove = async () => {
+    setMenuOpen(false);
+    if (!window.confirm("Delete this post?")) return;
+    try {
+      await api.deletePost(post.id);
+      onChanged?.();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   return (
-     <div className="post" key={post.id} onClick={(e) => handleItemClick(e)}>
+    <div className="post">
       <div className="postWrapper">
         <div className="postTop">
           <div className="postTopLeft">
-            <img
-              className="postProfileImg"
-              src={users.filter((u) => u.id === post?.user_id)[0]?.personPic || "https://via.placeholder.com/150"}
-              alt=""
-            />
-            <span className="postUsername">
-              {users.filter((u) => u.id === post?.user_id)[0].name}
-            </span>
-            <span className="postDate">{post.date_created}</span>
+            <img className="postProfileImg" src={imageSrc(post.author.personPic)} alt="" />
+            <span className="postUsername">{post.author.name}</span>
+            <span className="postDate">{formatDate(post.date_created)}</span>
           </div>
-          <div className="postTopRight">
-            <MoreVert />
-          </div>
+          {isOwner && (
+            <div className="postTopRight postMenu">
+              <button className="postMenuButton" aria-label="Post options" onClick={() => setMenuOpen((o) => !o)}>
+                <MoreVert />
+              </button>
+              {menuOpen && (
+                <div className="postMenuList">
+                  <button
+                    onClick={() => {
+                      setEditing(true);
+                      setMenuOpen(false);
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button onClick={remove}>Delete</button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
         <div className="postCenter">
-          <span className="postText">{post?.body}</span>
-          <img className="postImg" src={post.postpic} alt="" />
+          {editing ? (
+            <div className="postEdit">
+              <textarea value={draft} onChange={(e) => setDraft(e.target.value)} maxLength={500} rows={3} />
+              <div className="postEditActions">
+                <button className="btn btn-primary btn-sm" onClick={saveEdit}>
+                  Save
+                </button>
+                <button
+                  className="btn btn-light btn-sm"
+                  onClick={() => {
+                    setEditing(false);
+                    setDraft(post.body);
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <span className="postText">{post.body}</span>
+          )}
+          {post.postpic && <img className="postImg" src={imageSrc(post.postpic)} alt="" />}
+          {error && <div className="postError">{error}</div>}
         </div>
         <div className="postBottom">
           <div className="postBottomLeft">
-            <ThumbDownAlt className="postIcons" onClick={likeHandler} />
-            < ThumbUpAlt className="postIcons" onClick={likeHandler} />
-            <span className="postLikeCounter">{like} people like this</span>
+            <ThumbUpAlt
+              className="postIcons"
+              onClick={toggleLike}
+              style={{ color: liked ? "#1877f2" : undefined }}
+            />
+            <span className="postLikeCounter">{likes} people like this</span>
           </div>
           <div className="postBottomRight">
-            <h5 className="postCommentText">{post.comments.length} comments</h5>
+            <Link to={`/comments?id=${post.id}`} className="postCommentText">
+              {post.comments.length} comments
+            </Link>
           </div>
         </div>
       </div>

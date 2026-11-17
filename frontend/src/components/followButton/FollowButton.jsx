@@ -1,57 +1,27 @@
-import React, { useState } from 'react'
-import axios from 'axios';
+import { useState } from "react";
+import { api } from "../../api";
 
 const FollowButton = ({ user, initiallyFollowing = false }) => {
   const [isFollowing, setIsFollowing] = useState(initiallyFollowing);
-  const token = localStorage.getItem("token");
+  const [error, setError] = useState("");
 
-  const handleFollow = async () => {
+  const toggle = async () => {
+    setError("");
     try {
-      await axios.post(
-        `http://127.0.0.1:5000/api/v1/follow/${user.id}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setIsFollowing(true);
+      if (isFollowing) await api.unfollow(user.id);
+      else await api.follow(user.id);
+      setIsFollowing(!isFollowing);
     } catch (err) {
-      console.log(err);
-      // Optionally show an error message to the user
-    }
-  };
-
-  const handleUnFollow = async () => {
-    try {
-      await axios.post(
-        `http://127.0.0.1:5000/api/v1/unfollow/${user.id}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setIsFollowing(false);
-    } catch (err) {
-      console.log(err);
-      // Optionally show an error message to the user
+      setError(err.message);
     }
   };
 
   return (
     <div>
-      {isFollowing ? (
-        <button className="btn" onClick={handleUnFollow}>
-          Unfollow
-        </button>
-      ) : (
-        <button className="btn" onClick={handleFollow}>
-          Follow
-        </button>
-      )}
+      <button className="btn" onClick={toggle}>
+        {isFollowing ? "Unfollow" : "Follow"}
+      </button>
+      {error && <small className="text-danger d-block">{error}</small>}
     </div>
   );
 };

@@ -1,79 +1,48 @@
-import React, { useState } from 'react';
-import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import axios from 'axios'
-import './payrol.css'
+import "./payrol.css";
+import { useState } from "react";
+import { Navigate } from "react-router-dom";
+import Topbar from "../topbar/Topbar";
+import { api } from "../../api";
+import { useAuth } from "../../context/AuthContext";
 
+// Simulated plan change: the API flips the role directly, no real payment is taken.
 const Payrol = () => {
-    const [user_role, setUserId] = useState('premium'); // Default to mobile money
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-    const [premum, setPremim] = useState(false)
+  const { user, ready, refresh } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ text: "", error: false });
 
-    const handlePaymentMethodChange = (event) => {
-        setUserId(event.target.value);
-      };
+  if (!ready) return <h2>Loading...</h2>;
+  if (!user) return <Navigate to="/login" replace />;
 
-    const user_id = window.localStorage.getItem('id')
+  const isPremium = user.user_role === "premium";
 
-    const handlePayment = async () =>{
-        setLoading(true);
-        setError('')
-
-        const response = await axios.put(`http://127.0.0.1:5000/api/v1/premium`, { user_role },
-        {
-            headers:
-              {
-                  Authorization : `Bearer ${localStorage.getItem("token")}`
-              }
-          }
-        )
-        .then((res) =>{
-          console.log(res)
-          localStorage.setItem("user_role", res.data.data.user_role)
-            alert("successfully upgraded to premium")
-            setPremim(true)
-            
-            setLoading(false)
-
-        }).catch((err) =>{
-            console.log(err)
-        })
-        
-
+  const change = async () => {
+    setLoading(true);
+    setMessage({ text: "", error: false });
+    try {
+      await api.upgradeRole(isPremium ? "user" : "premium");
+      await refresh();
+      setMessage({ text: isPremium ? "Switched back to the free plan." : "You are now a premium user!", error: false });
+    } catch (err) {
+      setMessage({ text: err.message, error: true });
+    } finally {
+      setLoading(false);
     }
-
+  };
 
   return (
-    <> 
-      <div className='container payrol'>
-      <h2 className='h2'>Upgrade User Role</h2>
-      <p>Select Payment Method:</p>
-      <label className='checklable'>
-        <input
-          type="radio"
-          value="premium"
-          checked={user_role === 'premum'}
-          onChange={() => setUserId('premium')}
-        />
-        Mobile Money
-      </label>
-      <label className='checklable'>
-        <input
-          type="radio"
-          value="premium"
-          checked={user_role === 'premium'}
-          onChange={() => setUserId('premium')}
-        />
-        Mock Payment
-        </label>
-      <br />
-      {error && <p>{error}</p>}
-      <button className='btn' onClick={handlePayment} disabled={loading}>
-        {loading ? 'Processing...' : 'Upgrade Now'}
-      </button>
+    <>
+      <Topbar />
+      <div className="container payrol">
+        <h2 className="h2">Plan: {isPremium ? "Premium" : "Free"}</h2>
+        <p>This is a simulated upgrade. No payment details are collected.</p>
+        {message.text && <p style={{ color: message.error ? "#c62828" : "#2e7d32" }}>{message.text}</p>}
+        <button className="btn" onClick={change} disabled={loading}>
+          {loading ? "Processing..." : isPremium ? "Downgrade" : "Upgrade now"}
+        </button>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Payrol
+export default Payrol;

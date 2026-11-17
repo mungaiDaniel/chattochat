@@ -1,23 +1,13 @@
-import React, { useState } from "react";
-import axios from "axios";
 import "../login/login.css";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { IconButton, InputAdornment, TextField } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import logo from "../login/logo.jpg";
-import { Icon } from "@iconify/react";
-import { Link } from "react-router-dom";
-import {
-  IconButton,
-  InputAdornment,
-  TextField
-} from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import Topbar from "../../components/topbar/Topbar";
+import { api } from "../../api";
 
-const initialState = {
-  name: "",
-  username: "",
-  email: "",
-  password: ""
-};
+const initialState = { name: "", username: "", email: "", password: "" };
 
 const Register = () => {
   const [form, setForm] = useState(initialState);
@@ -34,98 +24,69 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setSuccess(false);
     try {
-      const res = await axios.post("http://127.0.0.1:5000/api/v1/register", form);
+      await api.register(form);
       setSuccess(true);
       setForm(initialState);
-      alert("Registration successful!");
-      setTimeout(() => {
-        navigate("/login");
-      }, 1500);
+      setTimeout(() => navigate("/login"), 1200);
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-        "Registration failed. Please check your input."
-      );
       setSuccess(false);
+      setError(err.message);
     }
   };
 
+  const field = (name, placeholder, type = "text", extra = {}) => (
+    <TextField
+      placeholder={placeholder}
+      type={type}
+      className="loginInput"
+      name={name}
+      value={form[name]}
+      onChange={handleChange}
+      required
+      {...extra}
+    />
+  );
+
   return (
     <>
-      <Topbar/>
+      <Topbar />
       <div className="login">
         <div className="loginWrapper container">
           <div className="loginLeft">
-            <img src={logo} alt="" className="logopic"/>
+            <img src={logo} alt="" className="logopic" />
             <h3 className="loginLogo">Chat to Chats</h3>
-            <span className="loginDesc">
-              Chat to chat with your friends
-            </span>
+            <span className="loginDesc">Chat to chat with your friends</span>
           </div>
           <div className="loginRight">
-            <div className="loginBox" style={{ height: "400px" }}>
-              <TextField 
-                placeholder="Name"
-                type="text"
-                className="loginInput"
-                name="name"
-                value={form.name}
-                onChange={handleChange}
-                required
-              />
-              <TextField 
-                placeholder="Username"
-                type="text"
-                className="loginInput"
-                name="username"
-                value={form.username}
-                onChange={handleChange}
-                required
-              />
-              <TextField 
-                placeholder="Email"
-                type="email"
-                className="loginInput"
-                name="email"
-                value={form.email}
-                onChange={handleChange}
-                required
-              />
-              <TextField 
-                placeholder="Password" 
-                type={showPassword ? "text" : "password"}
-                className="loginInput"
-                name="password"
-                value={form.password}
-                onChange={handleChange}
-                required
-                InputProps={{
+            <form className="loginBox" style={{ height: "auto", minHeight: "400px" }} onSubmit={handleSubmit}>
+              {field("name", "Name")}
+              {field("username", "Username")}
+              {field("email", "Email", "email")}
+              {field("password", "Password (min. 8 characters)", showPassword ? "text" : "password", {
+                inputProps: { minLength: 8 },
+                InputProps: {
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton
+                        aria-label="Toggle password visibility"
                         onClick={() => setShowPassword((prev) => !prev)}
                       >
-                        {showPassword ? (
-                          <Icon icon="eva:eye-fill" />
-                        ) : (
-                          <Icon icon="eva:eye-off-fill" />
-                        )}
+                        {showPassword ? <Visibility /> : <VisibilityOff />}
                       </IconButton>
                     </InputAdornment>
                   ),
-                }}
-              />
-              <button className="loginButton" type="submit" onClick={handleSubmit}>
+                },
+              })}
+              <button className="loginButton" type="submit">
                 Register
               </button>
               <div style={{ marginTop: "12px", textAlign: "center" }}>
                 <Link to="/login">Already have an account? Login</Link>
-                {error && <div style={{color: "red", marginBottom: "10px", marginTop: "10px"}}>{error}</div>}
-                {success && <div style={{color: "green", marginBottom: "10px", marginTop: "10px"}}>Registration successful!</div>}
+                {error && <div style={{ color: "red", marginTop: "10px" }}>{error}</div>}
+                {success && <div style={{ color: "green", marginTop: "10px" }}>Registration successful!</div>}
               </div>
-            </div>
+            </form>
           </div>
         </div>
       </div>

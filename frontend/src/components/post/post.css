@@ -85,3 +85,30 @@
 
   @media(max-width:660px){
   }
+.postMenu { position: relative; }
+.postMenuButton { background: none; border: none; cursor: pointer; padding: 0; }
+.postMenuList {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+.postMenuList button {
+  background: none;
+  border: none;
+  padding: 8px 18px;
+  text-align: left;
+  cursor: pointer;
+}
+.postMenuList button:hover { background: #f0f2f5; }
+.postEdit { width: 100%; }
+.postEdit textarea { width: 100%; border: 1px solid #ccd0d5; border-radius: 6px; padding: 8px; }
+.postEditActions { display: flex; gap: 8px; margin-top: 6px; }
+.postError { color: #c62828; font-size: 13px; margin-top: 6px; }
+a.postCommentText { text-decoration: none; color: inherit; cursor: pointer; font-size: 15px; font-weight: 400; border-bottom: 1px dashed gray; }

@@ -1,81 +1,86 @@
 import "./share.css";
-import {PermMedia, Label,Room, EmojiEmotions} from "@material-ui/icons"
 import { useState } from "react";
-import httpClient from "../../httpClient";
+import { Link } from "react-router-dom";
+import { PermMedia } from "@mui/icons-material";
+import { api } from "../../api";
+import { useAuth } from "../../context/AuthContext";
+import { imageSrc } from "../../utils/media";
 
-export default function Share() {
+export default function Share({ onPosted }) {
+  const { user } = useAuth();
+  const [body, setBody] = useState("");
+  const [photo, setPhoto] = useState(null);
+  const [message, setMessage] = useState({ text: "", error: false });
+  const [busy, setBusy] = useState(false);
 
-  
-  const[postpic, setPostpic] = useState("")
-  const[likes, setLikes] = useState(0)
-  const [success, setSuccess] = useState('')
-  const[body, setBody] = useState("")
-
-  const AddPost = async () =>{
-  const resp = await httpClient.post("http://127.0.0.1:5000/api/v1/post",{
-    postpic,
-    likes,
-    body,
-  },
-  {
-    headers:
-      {
-          Authorization : `Bearer ${localStorage.getItem("token")}`
-      }
-  }
-  ).then((res) =>{
-    setSuccess("successfully posted")
-    setTimeout(() =>{
-      setSuccess('')
-    }, 4000)
-
-  }).catch((err) =>{
-    
-    console.log(err)
-    setSuccess('NOT ADMIN')
-    setTimeout(() =>{
-      setSuccess('')
-    }, 4000)
-  })
+  const flash = (text, error = false) => {
+    setMessage({ text, error });
+    setTimeout(() => setMessage({ text: "", error: false }), 4000);
   };
 
+  const submit = async () => {
+    if (!body.trim()) return flash("Write something first.", true);
+    setBusy(true);
+    try {
+      await api.createPost({ body, photo });
+      setBody("");
+      setPhoto(null);
+      flash("Posted!");
+      onPosted?.();
+    } catch (err) {
+      flash(err.message, true);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (!user) {
+    return (
+      <div className="share">
+        <div className="shareWrapper">
+          <p className="mb-0">
+            <Link to="/login">Log in</Link> to share a post.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="share">
       <div className="shareWrapper">
         <div className="shareTop">
-          <img className="shareProfileImg" src="https://randomuser.me/api/portraits/women/72.jpg" alt="" />
+          <img className="shareProfileImg" src={imageSrc(user.personPic)} alt="" />
           <input
-            placeholder="What's in your mind Safak?"
+            placeholder={`What's on your mind, ${user.name.split(" ")[0]}?`}
             className="shareInput"
             value={body}
+            maxLength={500}
             onChange={(e) => setBody(e.target.value)}
           />
         </div>
-        <hr className="shareHr"/>
-        <span className="successfull">{success}</span>
+        <hr className="shareHr" />
+        <span className="successfull" style={{ color: message.error ? "#c62828" : undefined }}>
+          {message.text}
+        </span>
         <div className="shareBottom">
-            <div className="shareOptions">
-                <div className="shareOption">
-                    <PermMedia htmlColor="tomato" className="shareIcon"/>
-                    <span className="shareOptionText">Photo or Video</span>
-                </div>
-                <div className="shareOption">
-                    <Label htmlColor="blue" className="shareIcon"/>
-                    <span className="shareOptionText">Tag</span>
-                </div>
-                <div className="shareOption">
-                    <Room htmlColor="green" className="shareIcon"/>
-                    <span className="shareOptionText">Location</span>
-                </div>
-                <div className="shareOption">
-                    <EmojiEmotions htmlColor="goldenrod" className="shareIcon"/>
-                    <span className="shareOptionText">Feelings</span>
-                </div>
-            </div>
-            <button type="submit" className="shareButton" onClick={() => AddPost()}>Share</button>
+          <div className="shareOptions">
+            <label htmlFor="postPhoto" className="shareOption">
+              <PermMedia htmlColor="tomato" className="shareIcon" />
+              <span className="shareOptionText">{photo ? photo.name : "Photo"}</span>
+              <input
+                id="postPhoto"
+                type="file"
+                accept=".png,.jpg,.jpeg,.gif,.webp"
+                style={{ display: "none" }}
+                onChange={(e) => setPhoto(e.target.files[0] || null)}
+              />
+            </label>
+          </div>
+          <button type="button" className="shareButton" onClick={submit} disabled={busy}>
+            {busy ? "Posting..." : "Share"}
+          </button>
         </div>
-        
       </div>
     </div>
   );

@@ -1,72 +1,49 @@
-import Topbar from '../../components/topbar/Topbar'
-import ShareComments from '../../components/shareComments/ShareComments'
-import OnePost from './OnePost'
-import './comments.css'
-import React, { useState , useEffect } from 'react'
-import axios from 'axios'
-import { MoreVert , ThumbUpAlt, ThumbDownAlt } from "@material-ui/icons";
-
-
-import { useLocation } from 'react-router-dom'
+import "./comments.css";
+import { Link, useSearchParams } from "react-router-dom";
+import Topbar from "../../components/topbar/Topbar";
+import ShareComments from "../../components/shareComments/ShareComments";
+import OnePost from "./OnePost";
+import useFetch from "../../hooks/useFetch";
+import { api } from "../../api";
+import { formatDate, imageSrc } from "../../utils/media";
 
 const Comments = () => {
+  const [params] = useSearchParams();
+  const postId = params.get("id");
+  const { data: post, error, loading, reload } = useFetch(() => api.getPost(postId), [postId]);
 
-  const location = useLocation();
-  const urlParams = new URLSearchParams(location.search)
-  const question_id = urlParams.get('id')
-  
-  const [comments, setComments] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-  axios.get(`http://127.0.0.1:5000/api/v1/comment/${question_id}`)
-    .then((response) => {
-      // Defensive: if not array, make it an array
-      const data = response.data.data;
-      setComments(Array.isArray(data) ? data : []);
-      setIsLoading(false);
-    })
-    .catch((error) => {
-      setIsLoading(false);
-      setComments([]);
-      console.error("Failed to fetch comments:", error);
-    });
-}, [question_id]);
-
-if (isLoading){
-  return <h2>Loading....</h2>
-}
   return (
     <>
-    <Topbar />
-    <OnePost question_id={question_id} />
-    <ShareComments question_id={question_id} />
-    {
-      comments.map((comment) =>{
-
-        return <div className="post">
-        <div className="postWrapper">
-          <div className="postTop">
-            <div className="postTopLeft">
-              <span className="postUsername">
-              </span>
-              <span className="postDate">{comment.date_created}</span>
-            </div>
-            <div className="postTopRight">
-              <MoreVert />
-            </div>
-          </div>
-          <div className="postCenter">
-            <span className="postText">{comment?.body}</span>
-          </div>
-        </div>
+      <Topbar />
+      <div className="container mt-3">
+        <Link to="/home">&larr; Back to feed</Link>
       </div>
-
-      })
-    }
-    
+      {loading && <h2>Loading...</h2>}
+      {error && <div className="alert alert-danger m-3">{error}</div>}
+      {post && (
+        <>
+          <OnePost post={post} />
+          <ShareComments postId={postId} onPosted={reload} />
+          {post.comments.map((comment) => (
+            <div className="post" key={comment.id}>
+              <div className="postWrapper">
+                <div className="postTop">
+                  <div className="postTopLeft">
+                    <img className="postProfileImg" src={imageSrc(comment.author.personPic)} alt="" />
+                    <span className="postUsername">{comment.author.name}</span>
+                    <span className="postDate">{formatDate(comment.date_created)}</span>
+                  </div>
+                </div>
+                <div className="postCenter">
+                  <span className="postText">{comment.body}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </>
+      )}
     </>
-  )
-}
+  );
+};
 
-export default Comments
+export default Comments;

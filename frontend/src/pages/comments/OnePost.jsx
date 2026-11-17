@@ -1,62 +1,23 @@
-import React, { useState , useEffect } from 'react'
-import axios from 'axios'
-import { MoreVert , ThumbUpAlt, ThumbDownAlt } from "@material-ui/icons";
+import "./comments.css";
+import { formatDate, imageSrc } from "../../utils/media";
 
-import './comments.css'
-
-const OnePost = ({question_id}) => {
-
-    const [posts, setPost] = useState([])
-    const[users, setUser] = useState([])
-    const [isLoading, setIsLoading] = useState(true)
-  
-    useEffect(() => {
-      axios.get("http://127.0.0.1:5000/api/v1/user")
-      .then((response) =>{
-        setUser(response.data.data)
-        setIsLoading(false)
-      })
-    }, [])
-
-    useEffect(() => {
-    axios.get(`http://127.0.0.1:5000/api/v1/post/${question_id}`)
-    .then((response) =>{
-        setPost([response.data.data]) // wrap in array
-        setIsLoading(false)
-    } )
-}, [question_id])
-    if (isLoading){
-        return <h2>Loading....</h2>
-    }
-  return (
-    
-    <div className="post">
-        {posts.map((post, key) =>{
-            return <div className="postWrapper" key={post.id || key}>
-            <div className="postTop">
-              <div className="postTopLeft">
-                <img
-                  className="postProfileImg"
-                  src={users.filter((u) => u.id === post?.user_id)[0]?.personPic || "https://via.placeholder.com/150"}
-                  alt=""
-                />
-                <span className="postUsername">
-                  {users.filter((u) => u.id === post?.user_id)[0].name}
-                </span>
-                <span className="postDate">{post.date_created}</span>
-              </div>
-              <div className="postTopRight">
-                <MoreVert />
-              </div>
-            </div>
-            <div className="postCenter">
-              <span className="postText">{post.comments.length}</span>
-            </div>
-          </div>
-    })}
-    
+// The post a comment thread belongs to.
+const OnePost = ({ post }) => (
+  <div className="post">
+    <div className="postWrapper">
+      <div className="postTop">
+        <div className="postTopLeft">
+          <img className="postProfileImg" src={imageSrc(post.author.personPic)} alt="" />
+          <span className="postUsername">{post.author.name}</span>
+          <span className="postDate">{formatDate(post.date_created)}</span>
+        </div>
+      </div>
+      <div className="postCenter">
+        <span className="postText">{post.body}</span>
+        {post.postpic && <img className="postImg" src={imageSrc(post.postpic)} alt="" />}
+      </div>
+    </div>
   </div>
-  )
-}
+);
 
-export default OnePost
+export default OnePost;

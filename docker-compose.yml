@@ -1,0 +1,17 @@
+# Local PostgreSQL for running the API against the same database engine as production.
+#   docker compose up -d db
+#   DATABASE_URL=postgresql://chat2chat:chat2chat@localhost:5432/chat2chat
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: chat2chat
+      POSTGRES_PASSWORD: chat2chat
+      POSTGRES_DB: chat2chat
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
